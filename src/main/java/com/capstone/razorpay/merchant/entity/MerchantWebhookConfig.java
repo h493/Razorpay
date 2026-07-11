@@ -1,0 +1,30 @@
+package com.capstone.razorpay.merchant.entity;
+
+import jakarta.persistence.*;
+
+import java.util.UUID;
+
+@Entity
+@Table(name = "merchant_webhook_config")
+public class MerchantWebhookConfig {
+
+    @Id
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "merchant_id", nullable = false)
+    private Merchant merchant;
+
+    @Column(nullable = false, length = 200)
+    private String targetUrl; // www.zara.com/webhook/success
+
+    @Column(nullable = false, length = 200)
+    private String webhookSecretHash;
+
+    @Column(nullable = false)
+    private Boolean enabled = true;
+
+    private String eventTypes; // comma separated list of event types, e.g. payment.captured,payment.failed
+
+}
