@@ -1,0 +1,39 @@
+package com.capstone.razorpay.payment.entity;
+
+import com.capstone.razorpay.common.entity.Money;
+import com.capstone.razorpay.common.enums.OrderStatus;
+import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.UUID;
+
+@Entity
+@Table(name = "order_record")
+public class OrderRecord {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    // no FK - cross-service boundary
+    private UUID merchantId;
+
+    @Embedded
+    private Money amount;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    @Column(nullable = false)
+    private Integer attempts = 0;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> notes;
+
+    @Column(nullable = false)
+    private LocalDateTime expiresAt;
+}
