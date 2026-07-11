@@ -17,7 +17,7 @@ public class PaymentTransitionLog {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @Column(name = "payment_id", nullable = false)
+    @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 
     @Enumerated(EnumType.STRING)
