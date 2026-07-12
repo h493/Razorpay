@@ -34,7 +34,11 @@ public class OrderRecord {
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer attempts = 0;
+
+    @Column(nullable = false)
+    private String receipt;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

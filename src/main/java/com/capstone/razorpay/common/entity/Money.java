@@ -2,22 +2,20 @@ package com.capstone.razorpay.common.entity;
 
 
 import jakarta.persistence.Embeddable;
+import lombok.*;
 
 
 @Embeddable
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
 public class Money {
 
     private int amountUnits;
     private String currency;
 
-    protected Money() {
-        // required by JPA
-    }
-
-    private Money(int amountUnits, String currency) {
-        this.amountUnits = amountUnits;
-        this.currency = currency;
-    }
 
     public static Money inr(int amountUnits){
         return new Money(amountUnits, "INR");
