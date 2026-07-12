@@ -3,12 +3,18 @@ package com.capstone.razorpay.operations.entity;
 import com.capstone.razorpay.common.entity.Money;
 import com.capstone.razorpay.common.enums.SettlementStatus;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "settlement")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Settlement {
 
     @Id

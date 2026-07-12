@@ -2,6 +2,7 @@ package com.capstone.razorpay.operations.entity;
 
 import com.capstone.razorpay.common.enums.WebhookEventStatus;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "webhook_event")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class WebhookEvent {
 
     @Id

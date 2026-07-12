@@ -1,6 +1,7 @@
 package com.capstone.razorpay.operations.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "dlq_event")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class DlqEvent {
 
     @Id

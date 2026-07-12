@@ -1,9 +1,15 @@
 package com.capstone.razorpay.operations.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "settlement_payment")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class SettlementPayment {
 
     @EmbeddedId
