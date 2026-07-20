@@ -57,6 +57,9 @@ public class Payment extends BaseEntity {
 
     @Column(length = 100)
     private String bandReference;
+
+    @Column(length = 100)
+    private String processorReference;
     @Column(length = 100)
     private String errorCode;
     @Column(length = 255)

@@ -10,6 +10,8 @@ import com.capstone.razorpay.payment.entity.OrderRecord;
 import com.capstone.razorpay.payment.entity.Payment;
 import com.capstone.razorpay.payment.gateway.PaymentGatewayRouter;
 import com.capstone.razorpay.payment.gateway.dto.PaymentRequest;
+import com.capstone.razorpay.payment.gateway.dto.PaymentResult;
+import com.capstone.razorpay.payment.mapper.PaymentMapper;
 import com.capstone.razorpay.payment.repository.OrderRepository;
 import com.capstone.razorpay.payment.repository.PaymentRepository;
 import com.capstone.razorpay.payment.service.PaymentService;
@@ -27,6 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentGatewayRouter paymentGatewayRouter;
+    private final PaymentMapper paymentMapper;
 
     @Override
     @Transactional
@@ -52,9 +55,22 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
 
         payment = paymentRepository.save(payment);
-        PaymentRequest paymentRequest = new PaymentRequest(payment.getId(), request.orderId(), merchantId, order.getAmount(), request.method(), request.methodDetails());
+        PaymentRequest paymentRequest = new PaymentRequest(payment.getId(), request.orderId(),
+                merchantId, order.getAmount(), request.method(), request.methodDetails());
 
-        paymentGatewayRouter.initiate(paymentRequest);
-        return null;
+        PaymentResult result = paymentGatewayRouter.initiate(paymentRequest);
+
+        if(result instanceof PaymentResult.Pending pending){
+            payment.setProcessorReference(pending.registrationReference());
+        }else if(result instanceof PaymentResult.Failure failure){
+            payment.setStatus(PaymentStatus.FAILED);
+            payment.setErrorCode(failure.errorCode());
+            payment.setErrorDescription(failure.errorDescription());
+        }
+
+        payment = paymentRepository.save(payment);
+        orderRepository.save(order);
+
+        return paymentMapper.toResponse(payment);
     }
 }

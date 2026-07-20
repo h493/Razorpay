@@ -2,6 +2,7 @@ package com.capstone.razorpay.payment.gateway;
 
 import com.capstone.razorpay.common.enums.PaymentMethod;
 import com.capstone.razorpay.payment.gateway.dto.PaymentRequest;
+import com.capstone.razorpay.payment.gateway.dto.PaymentResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +14,11 @@ public class PaymentGatewayRouter {
 
     private final Map<PaymentMethod, PaymentAdapter> paymentAdapterMap;
 
-    public void initiate(PaymentRequest paymentRequest){
+    public PaymentResult initiate(PaymentRequest paymentRequest){
         PaymentAdapter paymentAdapter = paymentAdapterMap.get(paymentRequest.method());
         if(paymentAdapter == null){
             throw new IllegalArgumentException("No Payment Adapter Register for method: " + paymentRequest.method());
         }
-        paymentAdapter.initiate(paymentRequest);
+        return paymentAdapter.initiate(paymentRequest);
     }
 }
