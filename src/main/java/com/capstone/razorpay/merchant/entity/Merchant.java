@@ -1,5 +1,6 @@
 package com.capstone.razorpay.merchant.entity;
 
+import com.capstone.razorpay.common.entity.BaseEntity;
 import com.capstone.razorpay.common.enums.BusinessType;
 import com.capstone.razorpay.common.enums.MerchantStatus;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ indexes = {
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Merchant {
+public class Merchant extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

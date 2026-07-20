@@ -1,5 +1,6 @@
 package com.capstone.razorpay.payment.entity;
 
+import com.capstone.razorpay.common.entity.BaseEntity;
 import com.capstone.razorpay.common.enums.PaymentActor;
 import com.capstone.razorpay.common.enums.PaymentEvent;
 import com.capstone.razorpay.common.enums.PaymentStatus;
@@ -19,7 +20,7 @@ indexes = {
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PaymentTransitionLog {
+public class PaymentTransitionLog extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

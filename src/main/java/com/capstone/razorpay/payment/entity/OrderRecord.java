@@ -1,5 +1,6 @@
 package com.capstone.razorpay.payment.entity;
 
+import com.capstone.razorpay.common.entity.BaseEntity;
 import com.capstone.razorpay.common.entity.Money;
 import com.capstone.razorpay.common.enums.OrderStatus;
 import jakarta.persistence.*;
@@ -22,7 +23,7 @@ indexes = {
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderRecord {
+public class OrderRecord extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
