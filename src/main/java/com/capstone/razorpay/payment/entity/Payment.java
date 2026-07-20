@@ -38,18 +38,18 @@ public class Payment extends BaseEntity {
     private UUID merchantId;
 
     @Embedded
-    private Money money;
+    private Money amount;
 
     @Column(nullable = false, length = 100)
     private String idempotencyKey;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PaymentStatus paymentStatus;
+    private PaymentStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PaymentMethod paymentMethod;
+    private PaymentMethod method;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "method_details", columnDefinition = "jsonb")
