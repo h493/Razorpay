@@ -28,7 +28,7 @@ public class ApiKeyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ApiKeyResponse>> listByMercjant(@PathVariable UUID merchantId){
+    public ResponseEntity<List<ApiKeyResponse>> listByMerchant(@PathVariable UUID merchantId){
         return ResponseEntity.ok(apiKeyService.listByMerchant(merchantId));
     }
 

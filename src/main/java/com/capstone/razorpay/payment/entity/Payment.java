@@ -26,8 +26,8 @@ public class Payment {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "order_record_id", nullable = false)
-    private OrderRecord orderRecord;
+    @JoinColumn(name = "order_id", nullable = false)
+    private OrderRecord order;
 
     @Column(nullable = false)
     private UUID merchantId;
