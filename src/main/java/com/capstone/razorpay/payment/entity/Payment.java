@@ -66,6 +66,7 @@ public class Payment extends BaseEntity {
     private String errorDescription;
 
     private LocalDateTime authorizedAt;
+    private LocalDateTime capturedAt;
     private LocalDateTime failedAt;
     private LocalDateTime refundedAt;
     private LocalDateTime settledAt;
