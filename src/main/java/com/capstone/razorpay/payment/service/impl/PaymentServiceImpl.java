@@ -1,6 +1,7 @@
 package com.capstone.razorpay.payment.service.impl;
 
 import com.capstone.razorpay.common.enums.OrderStatus;
+import com.capstone.razorpay.common.enums.PaymentEvent;
 import com.capstone.razorpay.common.enums.PaymentStatus;
 import com.capstone.razorpay.common.exception.BusinessRuleViolationException;
 import com.capstone.razorpay.common.exception.ResourceNotFoundException;
@@ -15,6 +16,7 @@ import com.capstone.razorpay.payment.mapper.PaymentMapper;
 import com.capstone.razorpay.payment.repository.OrderRepository;
 import com.capstone.razorpay.payment.repository.PaymentRepository;
 import com.capstone.razorpay.payment.service.PaymentService;
+import com.capstone.razorpay.payment.statemachine.PaymentTransitionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentGatewayRouter paymentGatewayRouter;
     private final PaymentMapper paymentMapper;
+    private final PaymentTransitionService paymentTransitionService;
 
     @Override
     @Transactional
@@ -64,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
         switch (result){
             case PaymentResult.Pending pending -> payment.setProcessorReference(pending.registrationReference());
             case PaymentResult.Failure failure -> {
-                payment.setStatus(PaymentStatus.FAILED);
+                paymentTransitionService.apply(payment, PaymentEvent.AUTHORIZE_FAILURE);
                 payment.setErrorCode(failure.errorCode());
                 payment.setErrorDescription(failure.errorDescription());
             }
@@ -86,16 +89,16 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findByIdAndMerchantId(paymentId, merchantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", paymentId));
 
-        payment.setStatus(PaymentStatus.CAPTURING); //TODO : StateMachine
+        paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_ATTEMPT);
 
         PaymentResult paymentResult = paymentGatewayRouter.capture(payment.getMethod(), paymentId);
 
         if(paymentResult instanceof PaymentResult.Success success){
-            payment.setStatus(PaymentStatus.CAPTURED);
+            paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_SUCCESS);
             payment.setCapturedAt(LocalDateTime.now());
             log.info("Payment captured, paymentId: {}", paymentId);
         }else if(paymentResult instanceof PaymentResult.Failure failure){
-            payment.setStatus(PaymentStatus.AUTHORIZED);
+            paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_FAILURE);
             payment.setErrorCode(failure.errorCode());
             payment.setErrorDescription(failure.errorDescription());
             log.warn("Payment capture failed, paymentId: {}", paymentId);
