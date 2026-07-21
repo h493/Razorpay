@@ -17,3 +17,6 @@ spring:
 payment:
   order:
     default-order-expiry-minutes: 45
+
+vault:
+  master-key: sasddfdwdsgdsfsnfvafasdjfonbfnkldssagoeww

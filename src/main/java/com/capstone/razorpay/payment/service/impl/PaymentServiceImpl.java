@@ -62,6 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentRequest paymentRequest = new PaymentRequest(payment.getId(), request.orderId(),
                 merchantId, order.getAmount(), request.method(), request.methodDetails());
 
+        paymentTransitionService.apply(payment, PaymentEvent.AUTHORIZE_ATTEMPT);
         PaymentResult result = paymentGatewayRouter.initiate(paymentRequest);
 
         switch (result){
@@ -72,7 +73,8 @@ public class PaymentServiceImpl implements PaymentService {
                 payment.setErrorDescription(failure.errorDescription());
             }
             case PaymentResult.Success success -> {
-
+                log.warn("Invalid state");
+                return null;
             }
         }
 
@@ -80,6 +82,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment = paymentRepository.save(payment);
         orderRepository.save(order);
 
+        //TODO : Send an outbox 
         return paymentMapper.toResponse(payment);
     }
 

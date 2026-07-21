@@ -42,7 +42,7 @@ public class NetBankingAdapter implements PaymentAdapter {
             };
         } catch (Exception e) {
             log.warn("NetBanking failed, paymentId: {}", request.paymentId());
-            return new PaymentResult.Failure("NETBANKING_FAILED", e.getMessage());
+            return new PaymentResult.Failure("NBK_FAILED", e.getMessage());
         }
     }
 

@@ -23,8 +23,8 @@ public class UPIPaymentProcessor implements PaymentProcessor {
 
         String processorReference = "UPI_PROCESSOR" + RandomizerUtil.randomBase64(16);
 
-        String redirectReference = "BANK_REF" + processorReference;
+//        String redirectReference = "BANK_REF" + processorReference;
 
-        return new PaymentProcessorResponse.Success(processorReference, redirectReference);
+        return new PaymentProcessorResponse.Pending(processorReference);
     }
 }

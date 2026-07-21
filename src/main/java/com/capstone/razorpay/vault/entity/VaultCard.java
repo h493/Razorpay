@@ -1,6 +1,7 @@
 package com.capstone.razorpay.vault.entity;
 
 import com.capstone.razorpay.common.entity.BaseEntity;
+import com.capstone.razorpay.common.enums.CardBrand;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +34,8 @@ public class VaultCard extends BaseEntity {
     private byte[] encryptedDek;
 
     @Column(nullable = false)
-    private String brand; // VISA, RUPAY, MASTERCARD
+    @Enumerated(EnumType.STRING)
+    private CardBrand brand; // VISA, RUPAY, MASTERCARD
 
     @Column(nullable = false)
     private String expiryMonth;
