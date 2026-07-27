@@ -1,5 +1,6 @@
 package com.capstone.razorpay.payment.controller;
 
+import com.capstone.razorpay.merchant.security.MerchantContext;
 import com.capstone.razorpay.payment.dto.request.CreateOrderRequest;
 import com.capstone.razorpay.payment.dto.response.OrderResponse;
 import com.capstone.razorpay.payment.service.OrderService;
@@ -20,12 +21,12 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+    private final MerchantContext merchantContext;
 
-    UUID merchantId = UUID.fromString("becf6766-f7a6-4cb0-8db8-45f9d2b633aa");
 
     @PostMapping
     public ResponseEntity<OrderResponse> create(@RequestBody @Valid CreateOrderRequest request){
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(orderService.create(merchantId, request));
+                .body(orderService.create(merchantContext.getMerchantId(), request));
     }
 }

@@ -35,7 +35,7 @@ payment:
         success-rate: 80
 
 vault:
-  master-key: ${VAULT_MASTER_KEY:bTcXT3/ChQdtGYi566sUnf0mB0UhBUswHQOKRdEbLow=}
+  master-key: nKCLYvAZp7F37LiCGU6qzesmecuFM1ZW3IRDUF7xS3Y=
 
 jwt:
   secret-key: asdsfhsnsfjsadjiosdjasjdasndsdjoasjdopasdsavcifdfjdontuseinprod

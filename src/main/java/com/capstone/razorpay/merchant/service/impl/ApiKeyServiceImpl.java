@@ -14,6 +14,7 @@ import com.capstone.razorpay.merchant.service.ApiKeyService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     private final MerchantRepository merchantRepository;
     private final ApiKeyRepository apiKeyRepository;
     private final ApiKeyMapper apiKeyMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -43,7 +45,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         ApiKey apiKey = ApiKey.builder()
                 .merchant(merchant)
                 .keyId(keyId)
-                .keySecretHash(rawSecret) //TODO : encode with BcryprtPasswordEncoder
+                .keySecretHash(passwordEncoder.encode(rawSecret))
                 .environment(request.environment())
                 .build();
 

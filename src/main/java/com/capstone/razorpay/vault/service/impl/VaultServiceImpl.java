@@ -58,6 +58,7 @@ public class VaultServiceImpl implements VaultService {
                 .bin(bin)
                 .encryptedDek(encryptedDek)
                 .encryptedPan(encryptedPan)
+                .cardHolderName(request.cardHolderName())
                 .build();
         vaultCard = vaultCardRepository.save(vaultCard);
 

@@ -1,5 +1,6 @@
 package com.capstone.razorpay.payment.controller;
 
+import com.capstone.razorpay.merchant.security.MerchantContext;
 import com.capstone.razorpay.payment.dto.request.PaymentInitRequest;
 import com.capstone.razorpay.payment.dto.response.PaymentResponse;
 import com.capstone.razorpay.payment.service.PaymentService;
@@ -17,16 +18,16 @@ import java.util.UUID;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    UUID merchantId = UUID.fromString("becf6766-f7a6-4cb0-8db8-45f9d2b633aa"); // TODO: replace with authenticated merchant id
+    private final MerchantContext merchantContext;
 
     @PostMapping
     public ResponseEntity<PaymentResponse> initiate(@Valid  @RequestBody PaymentInitRequest request){
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.initiate(merchantId, request));
+                .body(paymentService.initiate(merchantContext.getMerchantId(), request));
     }
 
     @PostMapping("/{paymentId}/capture")
     public ResponseEntity<PaymentResponse> capture(@PathVariable UUID paymentId){
-        return ResponseEntity.ok(paymentService.capture(merchantId, paymentId));
+        return ResponseEntity.ok(paymentService.capture(merchantContext.getMerchantId(), paymentId));
     }
 }
