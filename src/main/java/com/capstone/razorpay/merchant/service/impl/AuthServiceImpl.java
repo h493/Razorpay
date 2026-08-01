@@ -42,21 +42,21 @@ public class AuthServiceImpl implements AuthService {
             throw new DuplicateResourceException("DUPLICATE_MERCHANT", "Merchant with email already exists : " + request.email());
         }
 
-        Merchant mercant = merchantMapper.toEntityFromSignUpRequest(request);
-        mercant.setStatus(MerchantStatus.PENDING_KYC);
+        Merchant merchant = merchantMapper.toEntityFromSignUpRequest(request);
+        merchant.setStatus(MerchantStatus.PENDING_KYC);
 
-        mercant = merchantRepository.save(mercant);
+        merchant = merchantRepository.save(merchant);
 
         AppUser appUser = AppUser.builder()
                 .email(request.email())
-                .merchant(mercant)
+                .merchant(merchant)
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .role(UserRole.OWNER)
                 .build();
 
         appUserRepository.save(appUser);
 
-        return merchantMapper.toResponse(mercant);
+        return merchantMapper.toResponse(merchant);
     }
 
     @Override

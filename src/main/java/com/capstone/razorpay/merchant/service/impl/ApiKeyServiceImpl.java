@@ -85,7 +85,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
         String newRawSecret = RandomizerUtil.randomBase64(40);
         apiKey.setPreviousKeySecretHash(apiKey.getKeySecretHash());
-        apiKey.setKeySecretHash(newRawSecret);  //TODO : encode with BcryprtPasswordEncoder
+        apiKey.setKeySecretHash(passwordEncoder.encode(newRawSecret));
         apiKey.setRotatedAt(LocalDateTime.now());
         apiKey.setGracePeriodExpiryAt(LocalDateTime.now().plusHours(24));
 
