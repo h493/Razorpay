@@ -2,6 +2,7 @@ package com.capstone.razorpay.merchant.service.impl;
 
 import com.capstone.razorpay.common.exception.ResourceNotFoundException;
 import com.capstone.razorpay.common.util.RandomizerUtil;
+import com.capstone.razorpay.merchant.cache.ApiKeyCache;
 import com.capstone.razorpay.merchant.dto.request.CreateApiKeyRequest;
 import com.capstone.razorpay.merchant.dto.response.ApiKeyCreateResponse;
 import com.capstone.razorpay.merchant.dto.response.ApiKeyResponse;
@@ -31,6 +32,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     private final ApiKeyRepository apiKeyRepository;
     private final ApiKeyMapper apiKeyMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ApiKeyCache apiKeyCache;
 
     @Override
     @Transactional
@@ -70,6 +72,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
         apiKey.setEnabled(false);
         apiKeyRepository.save(apiKey); // even if we skip this it will happen because of persistence context we got in transactional
+        apiKeyCache.evict(apiKey.getKeyId());
     }
 
     @Override
@@ -87,9 +90,11 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         apiKey.setPreviousKeySecretHash(apiKey.getKeySecretHash());
         apiKey.setKeySecretHash(passwordEncoder.encode(newRawSecret));
         apiKey.setRotatedAt(LocalDateTime.now());
-        apiKey.setGracePeriodExpiryAt(LocalDateTime.now().plusHours(24));
+        apiKey.setGracePeriodExpiresAt(LocalDateTime.now().plusHours(24));
 
         apiKey = apiKeyRepository.save(apiKey);
+
+        apiKeyCache.evict(apiKey.getKeyId());
 
         return new ApiKeyCreateResponse(apiKey.getId(), apiKey.getKeyId(),
                 newRawSecret, apiKey.getEnvironment().name());
