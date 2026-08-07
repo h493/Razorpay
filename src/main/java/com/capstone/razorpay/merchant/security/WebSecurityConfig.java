@@ -1,5 +1,6 @@
 package com.capstone.razorpay.merchant.security;
 
+import com.capstone.razorpay.common.idempotency.IdempotencyFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ public class WebSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
+    private final IdempotencyFilter idempotencyFilter;
 
     @Bean
     public SecurityFilterChain jwtChain(HttpSecurity http){
@@ -35,6 +37,7 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(idempotencyFilter, JwtAuthenticationFilter.class)
                 .build();
     }
 
@@ -49,6 +52,7 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(idempotencyFilter, ApiKeyAuthenticationFilter.class)
                 .build();
     }
 
