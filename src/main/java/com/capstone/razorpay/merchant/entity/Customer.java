@@ -32,7 +32,7 @@ public class Customer extends BaseEntity {
     private String email; // can come from zara , zomato, swiggy, etc. so not unique
 
     @Column(length = 20)
-    private String contactNumber;
+    private String phone;
 
     private LocalDateTime deletedAt;
 
