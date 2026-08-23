@@ -83,7 +83,7 @@ public class VaultServiceImpl implements VaultService {
         byte[] panBytes = null;
         try {
             byte[] dek = dekEncrypter.decrypt(vaultCard.getEncryptedDek());
-            panBytes = VaultEncryptionConfig.panEncrypter(dek).decrypt(vaultCard.getEncryptedDek());
+            panBytes = VaultEncryptionConfig.panEncrypter(dek).decrypt(vaultCard.getEncryptedPan());
 
             String pan = new String(panBytes, StandardCharsets.UTF_8);
             String expiry = vaultCard.getExpiryMonth() + "/" + vaultCard.getExpiryYear();

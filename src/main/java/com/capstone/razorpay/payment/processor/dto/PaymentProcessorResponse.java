@@ -9,5 +9,5 @@ public sealed interface PaymentProcessorResponse permits
 
      record Success(String processorReference, String bankReference) implements PaymentProcessorResponse{}
 
-    record Failure(String errorCode, String errorDescription) implements PaymentProcessorResponse{}
+     record Failure(String errorCode, String errorDescription) implements PaymentProcessorResponse{}
 }

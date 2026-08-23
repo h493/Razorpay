@@ -22,7 +22,6 @@ import com.capstone.razorpay.payment.statemachine.PaymentTransitionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -146,7 +145,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void resolveAuthorization(UUID paymentId, boolean approve, String bankRef, String errorCode, String errorDescription) {
 
-        Payment payment = paymentRepository.findbyIdForUpdate(paymentId)
+        Payment payment = paymentRepository.findByIdForUpdate(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", paymentId));
 
         if(payment.getStatus() != PaymentStatus.AUTHORIZING) {
