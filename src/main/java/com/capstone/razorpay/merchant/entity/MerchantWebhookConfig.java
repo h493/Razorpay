@@ -30,11 +30,26 @@ public class MerchantWebhookConfig extends BaseEntity {
     private String targetUrl; // www.zara.com/webhook/success
 
     @Column(nullable = false, length = 200)
-    private String webhookSecretHash;
+    private String webhookSecret;
 
     @Column(nullable = false)
     private Boolean enabled = true;
 
     private String eventTypes; // comma separated list of event types, e.g. payment.captured,payment.failed
+
+    public boolean isSubscribedTo(String eventType){
+        if(eventTypes == null || eventTypes.isBlank()){
+            return true;
+        }
+
+        for(String type : eventTypes.split(",")){
+            String trimmed = type.trim();
+            if(trimmed.equalsIgnoreCase("ALL") || trimmed.equalsIgnoreCase(eventType)){
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }
