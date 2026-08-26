@@ -20,7 +20,7 @@ public class WebhookRetryQueue {
 
     private final StringRedisTemplate redisTemplate;
 
-    @Value("${app.webhook.delivery.redis-key:webhook-retry")
+    @Value("${app.webhook.delivery.redis-key:webhook-retry}")
     private String key;
 
     public void enqueue(UUID webhookEventId, LocalDateTime retryAt){

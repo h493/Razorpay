@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private static final String[] PUBLIC_ROUTES = {"/v1/auth/signup", "/v1/auth/login"};
+    private static final String[] PUBLIC_ROUTES = {"/v1/auth/signup", "/v1/auth/login", "/webhook/**"};
     private static final String[] JWT_ROUTES =  {"/v1/auth/**", "/v1/merchants/**", "/v1/admin/**", "/actuator/**"};
     private static final String[] API_KEY_ROUTES = {"/v1/orders/**", "/v1/payments/**", "/v1/vault/**"};
 

@@ -6,9 +6,11 @@ import com.capstone.razorpay.operations.repository.WebhookEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -36,7 +38,7 @@ public class WebhookDeliverExecutor {
 
     private final int MAX_ATTEMPTS = 7;
 
-    @Value("${webhook.delivery.signature-header:X-Razorpay-Signature")
+    @Value("${app.webhook.delivery.signature-header:X-Razorpay-Signature}")
     private String signatureHeader;
 
     @Transactional
@@ -67,6 +69,7 @@ public class WebhookDeliverExecutor {
                            "event", event.getEventType(),
                            "payload", event.getPayload()
                    )).retrieve()
+                   .onStatus(HttpStatusCode::isError, (request, res) -> { })
                    .toBodilessEntity();
 
            int statusCode = response.getStatusCode().value();
@@ -80,11 +83,17 @@ public class WebhookDeliverExecutor {
                return;
            }
 
-           handleAttemptFailed(event, "HTTP" + statusCode);
+           handleAttemptFailed(event, "HTTP " + statusCode);
+       }catch (ResourceAccessException e){
+           log.error("Could not reach merchant for webhook event {} : {}", webhookEventId, e.getMessage());
+           handleAttemptFailed(event, "IO: " + e.getMessage());
        }catch (RestClientException e){
-           event.setLastResponseBody(e.getMessage());
-           handleAttemptFailed(event, e.getMessage());
-           log.error("Got rest client exception :{}", e.getMessage());
+           log.error("Got rest client exception for webhook event {} : {}", webhookEventId, e.getMessage());
+           handleAttemptFailed(event, "CLIENT: " + e.getMessage());
+       }catch (RuntimeException e){
+           log.error("Non-retryable error delivering webhook event {}", webhookEventId, e);
+           event.setStatus(WebhookEventStatus.DEAD);
+           webhookDlqRecorder.recordAfterAttemptsExhausted(event, "FATAL: " + e);
        }
     }
 
