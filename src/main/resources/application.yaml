@@ -18,6 +18,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
+    listener:
+      ack-mode: manual
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
     consumer:
       group-id: razorpay-monolith
@@ -84,3 +86,6 @@ app:
       redis-key: "webhook-retry"
       poll-batch-size: 100
 
+threads:
+  virtual:
+    enabled: true

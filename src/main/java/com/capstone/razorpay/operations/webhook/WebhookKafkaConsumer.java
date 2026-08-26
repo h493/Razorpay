@@ -9,9 +9,11 @@ import com.capstone.razorpay.operations.repository.WebhookEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.dao.DataAccessException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.CannotCreateTransactionException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -29,6 +31,7 @@ public class WebhookKafkaConsumer {
     private final SignerUtil signerUtil;
     private final WebhookEventRepository webhookEventRepository;
     private final WebhookRetryQueue retryQueue;
+    private final WebhookDlqRecorder dlqRecorder;
 
     @KafkaListener(topics = {
             "${app.kafka.topics.order:orders.events}",
@@ -77,12 +80,16 @@ public class WebhookKafkaConsumer {
 
                 //redisQueue.enqueue(webhookEvent.getId())
                 retryQueue.enqueue(webhookEvent.getId(), webhookEvent.getNextRetryAt());
+                log.info("Created a webhook event with id : {}", webhookEvent.getId());
             }
 
             ack.acknowledge();
-        }catch (Exception e){
-            log.error("Webhook consumer failed to process the record, offset: {}", record.offset());
-
+        }catch (DataAccessException  | CannotCreateTransactionException dbDown){
+            log.error("Webhook consumer failed due to DB down, could not process the record, offset: {}, error : {}", record.offset(), dbDown.getMessage());
+        }catch (Exception logicError){
+            log.error("Webhook consumer failed due to logic error: {}", logicError.getMessage());
+            dlqRecorder.recordConsumerFailed(record, logicError.getMessage());
+            ack.acknowledge();
         }
     }
 }
