@@ -1,10 +1,8 @@
 package com.capstone.razorpay.merchant.service.impl;
 
 import com.capstone.razorpay.common.util.RandomizerUtil;
-import com.capstone.razorpay.merchant.api.MerchantWebhookApi;
 import com.capstone.razorpay.merchant.dto.request.UpdateWebhookConfigRequest;
 import com.capstone.razorpay.merchant.dto.response.WebhookConfigResponse;
-import com.capstone.razorpay.common.dto.WebhookTarget;
 import com.capstone.razorpay.merchant.entity.Merchant;
 import com.capstone.razorpay.merchant.entity.MerchantWebhookConfig;
 import com.capstone.razorpay.merchant.mapper.WebhookConfigMapper;
@@ -17,7 +15,6 @@ import org.springframework.security.crypto.encrypt.BytesEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +22,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WebhookConfigServiceImpl implements WebhookConfigService, MerchantWebhookApi {
+public class WebhookConfigServiceImpl implements WebhookConfigService {
 
     private final MerchantRepository merchantRepository;
     private final WebhookConfigRepository webhookConfigRepository;
@@ -92,16 +89,4 @@ public class WebhookConfigServiceImpl implements WebhookConfigService, MerchantW
                 .orElseThrow(() -> new RuntimeException("Config not found or not owned by merchant: " + merchantId));
     }
 
-    @Override
-    public List<WebhookTarget> getActiveConfigsForEvent(UUID merchantId, String eventType) {
-        return webhookConfigRepository.findByMerchant_IdAndEnabledTrue(merchantId).stream()
-                .filter(config -> config.isSubscribedTo(eventType))
-                .map(config -> {
-                    byte[] cipherBytes = Base64.getDecoder().decode(config.getWebhookSecret());
-                    byte[] decryptedSecretBytes = bytesEncryptor.decrypt(cipherBytes);
-                    return new WebhookTarget(config.getId(), config.getTargetUrl(), new String(decryptedSecretBytes, StandardCharsets.UTF_8));
-                })
-                .toList();
-
-    }
 }

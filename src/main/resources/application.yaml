@@ -39,7 +39,9 @@ spring:
         enable.idempotence: true
         max.in.flight.requests.per.connection: 5
         retries: 3
-
+  threads:
+    virtual:
+      enabled: true
 
 payment:
   order:
@@ -85,7 +87,6 @@ app:
     delivery:
       redis-key: "webhook-retry"
       poll-batch-size: 100
+      signature-header: "X-Razorpay-Signature"
 
-threads:
-  virtual:
-    enabled: true
+

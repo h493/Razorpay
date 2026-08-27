@@ -60,41 +60,41 @@ public class WebhookDeliverExecutor {
         event.setAttempts(event.getAttempts()+1);
         event.setLastAttemptAt(LocalDateTime.now());
 
-       try{
-           var response = restClient.post()
-                   .uri(event.getTargetUrl())
-                   .header(signatureHeader, event.getSignature())
-                   .contentType(MediaType.APPLICATION_JSON)
-                   .body(Map.of(
-                           "event", event.getEventType(),
-                           "payload", event.getPayload()
-                   )).retrieve()
-                   .onStatus(HttpStatusCode::isError, (request, res) -> { })
-                   .toBodilessEntity();
+        try{
+            var response = restClient.post()
+                    .uri(event.getTargetUrl())
+                    .header(signatureHeader, event.getSignature())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of(
+                            "event", event.getEventType(),
+                            "payload", event.getPayload()
+                    )).retrieve()
+                    .onStatus(HttpStatusCode::isError, (request, res) -> { })
+                    .toBodilessEntity();
 
-           int statusCode = response.getStatusCode().value();
-           event.setLastResponseCode(statusCode);
+            int statusCode = response.getStatusCode().value();
+            event.setLastResponseCode(statusCode);
 
-           if(response.getStatusCode().is2xxSuccessful()){
-               event.setStatus(WebhookEventStatus.DELIVERED);
-               event.setDeliveredAt(LocalDateTime.now());
-               webhookEventRepository.save(event);
-               log.info("Successfully called the merchant for webhook event : {}", webhookEventId);
-               return;
-           }
+            if(response.getStatusCode().is2xxSuccessful()){
+                event.setStatus(WebhookEventStatus.DELIVERED);
+                event.setDeliveredAt(LocalDateTime.now());
+                webhookEventRepository.save(event);
+                log.info("Successfully called the merchant for webhook event : {}", webhookEventId);
+                return;
+            }
 
-           handleAttemptFailed(event, "HTTP " + statusCode);
-       }catch (ResourceAccessException e){
-           log.error("Could not reach merchant for webhook event {} : {}", webhookEventId, e.getMessage());
-           handleAttemptFailed(event, "IO: " + e.getMessage());
-       }catch (RestClientException e){
-           log.error("Got rest client exception for webhook event {} : {}", webhookEventId, e.getMessage());
-           handleAttemptFailed(event, "CLIENT: " + e.getMessage());
-       }catch (RuntimeException e){
-           log.error("Non-retryable error delivering webhook event {}", webhookEventId, e);
-           event.setStatus(WebhookEventStatus.DEAD);
-           webhookDlqRecorder.recordAfterAttemptsExhausted(event, "FATAL: " + e);
-       }
+            handleAttemptFailed(event, "HTTP " + statusCode);
+        }catch (ResourceAccessException e){
+            log.error("Could not reach merchant for webhook event {} : {}", webhookEventId, e.getMessage());
+            handleAttemptFailed(event, "IO: " + e.getMessage());
+        }catch (RestClientException e){
+            log.error("Got rest client exception for webhook event {} : {}", webhookEventId, e.getMessage());
+            handleAttemptFailed(event, "CLIENT: " + e.getMessage());
+        }catch (RuntimeException e){
+            log.error("Non-retryable error delivering webhook event {}", webhookEventId, e);
+            event.setStatus(WebhookEventStatus.DEAD);
+            webhookDlqRecorder.recordAfterAttemptsExhausted(event, "FATAL: " + e);
+        }
     }
 
     private void handleAttemptFailed(WebhookEvent event, String error){
